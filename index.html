@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Luxury Cars — Models, Prices & Configurations</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Luxury Cars Gallery</h1>
+      <p class="tagline">McLaren • Maserati • Ferrari • BMW • Lamborghini • Maybach</p>
+      <div class="controls">
+        <label for="brandFilter">Filter brand:</label>
+        <select id="brandFilter">
+          <option value="all">All brands</option>
+        </select>
+        <input id="search" placeholder="Search model..." />
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="cards" class="cards-grid" aria-live="polite"></section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">Prices are sample MSRP (USD). Configurations are representative options for each model.</div>
+  </footer>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <button id="modalClose" class="modal-close" aria-label="Close">×</button>
+      <h2 id="modalTitle"></h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
