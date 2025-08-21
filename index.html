@@ -1,43 +1,157 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Luxury Cars — Models, Prices & Configurations</title>
+  <title>Luxury Performance Cars</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <header class="site-header">
-    <div class="container">
-      <h1>Luxury Cars Gallery</h1>
-      <p class="tagline">McLaren • Maserati • Ferrari • BMW • Lamborghini • Maybach</p>
-      <div class="controls">
-        <label for="brandFilter">Filter brand:</label>
-        <select id="brandFilter">
-          <option value="all">All brands</option>
+    <div class="container header-inner">
+      <h1>Exotics & Flagships</h1>
+      <div class="search-sort">
+        <input id="searchInput" type="search" placeholder="Search models, trims, engines…" />
+        <select id="sortSelect" aria-label="Sort cars">
+          <option value="relevance">Sort: Relevance</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+          <option value="power-desc">Power: High → Low</option>
+          <option value="accel-asc">0–100 km/h: Quickest</option>
+          <option value="year-desc">Newest Year</option>
         </select>
-        <input id="search" placeholder="Search model..." />
+        <button id="clearAll" class="btn ghost" type="button" title="Clear all filters">Clear</button>
       </div>
+      <button id="toggleFilters" class="btn mobile-only" type="button" aria-expanded="false" aria-controls="filtersPanel">
+        Filters
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M6 12h12M10 18h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
     </div>
   </header>
 
-  <main class="container">
-    <section id="cards" class="cards-grid" aria-live="polite"></section>
+  <main class="container layout">
+    <aside id="filtersPanel" class="filters" aria-label="Filters">
+      <form id="filtersForm">
+        <section>
+          <h2>Brand</h2>
+          <div class="chiplist" id="brandChips">
+            <!-- chips rendered by JS -->
+          </div>
+        </section>
+
+        <section>
+          <h2>Price (€)</h2>
+          <div class="range-pair">
+            <div>
+              <label for="minPrice">Min</label>
+              <input id="minPrice" type="number" min="0" step="1000" placeholder="0" />
+            </div>
+            <div>
+              <label for="maxPrice">Max</label>
+              <input id="maxPrice" type="number" min="0" step="1000" placeholder="1,000,000" />
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Power (hp)</h2>
+          <label for="minHp" class="sr-only">Minimum horsepower</label>
+          <input id="minHp" type="range" min="0" max="1100" step="10" value="0" />
+          <div class="range-readout"><span id="minHpValue">0</span>+ hp</div>
+        </section>
+
+        <section class="grid-2">
+          <div>
+            <h2>Drivetrain</h2>
+            <select id="drivetrain">
+              <option value="">Any</option>
+              <option>RWD</option>
+              <option>AWD</option>
+            </select>
+          </div>
+          <div>
+            <h2>Fuel</h2>
+            <select id="fuel">
+              <option value="">Any</option>
+              <option>Petrol</option>
+              <option>Hybrid</option>
+              <option>Electric</option>
+            </select>
+          </div>
+        </section>
+
+        <section>
+          <h2>Body</h2>
+          <div class="taglist">
+            <label><input type="checkbox" name="body" value="Coupe" />Coupe</label>
+            <label><input type="checkbox" name="body" value="Spider" />Spider</label>
+            <label><input type="checkbox" name="body" value="Sedan" />Sedan</label>
+            <label><input type="checkbox" name="body" value="SUV" />SUV</label>
+            <label><input type="checkbox" name="body" value="Gran Turismo" />Gran Turismo</label>
+            <label><input type="checkbox" name="body" value="Saloon" />Saloon</label>
+          </div>
+        </section>
+
+        <button class="btn primary full" type="submit">Apply Filters</button>
+      </form>
+    </aside>
+
+    <section class="results">
+      <div class="meta">
+        <div id="activeFilters" class="active-filters"><!-- active filters displayed here --></div>
+        <div id="resultsCount" class="results-count">0 cars</div>
+      </div>
+
+      <div id="cards" class="cards">
+        <!-- car cards injected here -->
+      </div>
+
+      <div id="emptyState" class="empty hidden" role="status">
+        <h3>No matches found</h3>
+        <p>Try broadening filters or clearing them.</p>
+        <button id="resetBtn" class="btn ghost" type="button">Reset filters</button>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
-    <div class="container">Prices are sample MSRP (USD). Configurations are representative options for each model.</div>
+    <div class="container">
+      <p>Prices are indicative (EUR) and for demo purposes.</p>
+    </div>
   </footer>
 
-  <!-- Modal -->
-  <div id="modal" class="modal" aria-hidden="true">
-    <div class="modal-content" role="dialog" aria-modal="true">
-      <button id="modalClose" class="modal-close" aria-label="Close">×</button>
-      <h2 id="modalTitle"></h2>
-      <div id="modalBody"></div>
+  <template id="cardTemplate">
+    <article class="card">
+      <div class="card-header">
+        <span class="brand-badge"></span>
+        <span class="year-pill"></span>
+      </div>
+      <h3 class="model"></h3>
+      <p class="price"></p>
+      <ul class="specs">
+        <li><strong>Engine:</strong> <span class="engine"></span></li>
+        <li><strong>Power:</strong> <span class="power"></span> hp</li>
+        <li><strong>0–100:</strong> <span class="accel"></span> s</li>
+        <li><strong>Drive:</strong> <span class="drive"></span></li>
+        <li><strong>Fuel:</strong> <span class="fuel"></span></li>
+        <li><strong>Body:</strong> <span class="body"></span></li>
+      </ul>
+      <div class="card-footer">
+        <button class="btn ghost details-btn" type="button">View details</button>
+      </div>
+    </article>
+  </template>
+
+  <div id="dialog" class="dialog hidden" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="dialog-content">
+      <button id="dialogClose" class="icon-btn" aria-label="Close dialog">×</button>
+      <h3 id="dialogTitle"></h3>
+      <div id="dialogBody" class="dialog-body"></div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js" defer></script>
 </body>
 </html>
